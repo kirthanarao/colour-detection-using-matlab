@@ -1,21 +1,22 @@
-img=imread('001.jpg');
+img=imread('bird.jpg');
 sheet1='colourlist.xlsx';
 rdata=xlsread(sheet1,'B:B');
 gdata=xlsread(sheet1,'C:C');
 bdata=xlsread(sheet1,'D:D');
 [~,colourdata]  = xlsread('colourlist.xlsx','A:A');
-a=imshow("001.jpg");
+a=imshow("bird.jpg");
 u=impixel;
 r=u(1,1);
 g=u(1,2);
 b=u(1,3);
+%Detection of colour of selected part
 colour=[r,g,b];
 if(r>=0 && r<=1 && g>=0 && g<=1 && b>=0 && b<=1)
     r=r*255;
     g=g*255;
     b=b*255;
 end
-minimum=50;
+minimum=35;
 for i=1:872
     d=abs(r-(rdata(i)))+abs(g-(gdata(i)))+abs(b-(bdata(i)));
 if(d<=minimum)
@@ -25,3 +26,34 @@ if(d<=minimum)
     break
 end
 end
+%converting rgb colour model to hsv colour model 
+r = r / 255.0;
+g = g / 255.0;
+b = b / 255.0;
+cmax = max(r,max(g, b));
+cmin = min(r,min(g, b));
+diff = cmax - cmin;
+h = -1;
+s = -1;
+if(cmax == cmin)
+      h = 0;
+
+elseif (cmax == r)
+    h = rem((60 * ((g - b) / diff) + 360), 360);
+elseif (cmax == g)
+    h = rem((60 * ((b - r) / diff) + 120) , 360);
+elseif (cmax == b)
+    h = rem((60 * ((r - g) / diff) + 240) , 360);
+end
+if(cmax == 0)
+  s = 0;
+else
+    s = (diff / cmax) * 100;
+end
+ v = cmax * 100;
+ t=[h, s ,v];% Hue,Saturation and Brightness
+ disp("HSV of the point selected is:")
+ disp(t)
+ k=rgb2hsv(img);
+ figure(2);
+ imshow(k);
